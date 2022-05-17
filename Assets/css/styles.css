@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100&family=Water+Brush&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital@1&family=Roboto:wght@100&family=Water+Brush&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Alegreya&family=Asap:wght@400;500&family=Orbitron&family=Waterfall&display=swap');
+html, body {
+    margin: 0px;
+    background-color: #2f4f30;
+    color: #fff;
+
+}
+h1 {
+    font-size: 21px;
+    padding: 10px 10px;
+    font-family: 'Playfair Display', serif;
+
+}
+.titulo{
+    text-align: center;
+    background-color: black;
+    color: white;
+    margin: 0px;
+    padding: 5px 5px;;
+    font-size: 40px;
+    font-family: 'Water Brush', cursive;
+
+}
+.carta {
+    position: relative;
+    width: 115px;
+    left: 80px;
+    margin-left: -80px; 
+}
+#computadora-cartas, #jugador-cartas {
+    height: 180px;
+    
+
+}
+.carta_barajeada {
+    position: relative;
+    width: 150px;
+    left: 80px;
+    margin-left: -80px;
+}
+
+
+.bg-modal {
+	background-color: rgba(0, 0, 0, 0.8);
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	display: none;
+	justify-content: center;
+	align-items: center;
+  
+}
+
+.modal-contents {
+	height: 250px;
+	width: 350px;
+	background-color: rgb(234, 225, 225);
+	text-align: center;
+	padding: 20px;
+	position: relative;
+	border-radius: 4px;
+    color: black;
+}
+
+
+.close {
+	position: absolute;
+	top: 0;
+	right: 10px;
+	font-size: 42px;
+	color: #333;
+	transform: rotate(45deg);
+	cursor: pointer;
+	
+}
+.close:hover {
+    color: #666;
+}
+#mensaje {
+    color: black;
+    font-size: 9 px;
+    font-family: 'Playfair Display', serif;
+    
+}
+#aviso {
+    padding: 20px 10px;
+    color: black;
+    font-weight: bold;
+    font-size:  50px;
+    font-family: 'Waterfall', cursive;
+    text-align: center;
+}
+#aviso2{
+    padding: 10px 10px;
+    color: black;
+    font-size:  33px;
+    font-size:  50px;
+    font-family: 'Waterfall', cursive;
+    text-align: center;
+}
