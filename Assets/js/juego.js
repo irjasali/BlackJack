@@ -206,23 +206,24 @@
           turnoComputadora(puntosJugador);  
       });
 
-      btnNuevoJuego.addEventListener("click", () => {
+      btnNuevoJuego.addEventListener("click", () => {       
+          soundFest("play");
           console.clear();      
           resetValues();
           barajarDeck();        
           deck = crearDeck();
-          soundFest("play",2);
           btnDetener.disabled = false;
           btnPedirCarta.disabled = false;
           btnBarajar.disabled = true;
           nombreJugadorPantalla.innerText = jugador + " - Puntos: " + puntosJugador;
           divCartasJugador.innerHTML = `<img class="carta" src="Assets/cartas/red_back.png">`;
           divCartasComputadora.innerHTML = `<img class="carta" src="Assets/cartas/red_back.png">`;
+          soundFest("pausa");
          
      });
 
       btnBarajar.addEventListener("click", () => {      
-        soundFest("pausa");
+        
         resetValues();
         deck = crearDeck();
         btnDetener.disabled = false;
@@ -275,7 +276,7 @@
 
       const soundFest =(valor)=>{
         const audio = new Audio("//manzdev.github.io/codevember2017/assets/eye-tiger.mp3");   
-        audio.volume = 0.5;  
+        audio.volume = 0.5;        
           switch (valor) {
           case "play": audio.play();break;
           case "pausa": audio.pause(); break;
