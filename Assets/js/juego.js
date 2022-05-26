@@ -1,14 +1,12 @@
 /* Patrón Módulo */ 
 (() =>{
-  'use strict'
-            
+  'use strict'            
       let deck = [];
       const tipos = ["C", "D", "H", "S"],
             cartasEspeciales = ["A", "J", "Q", "K"];
       let puntosJugador = 0,
           puntosComputadora = 0;
-      let jugador="";
-    
+      let jugador="";   
 
       // Referencias del HTML
       const btnPedirCarta = document.querySelector("#btnPedirCarta"),
@@ -41,8 +39,10 @@
                 if (!response.ok) {
                   throw new Error(response.statusText)               
                 }
+               
                 jugador = login;
                 nombreJugadorPantalla.innerText = jugador + " - Puntos: " + puntosJugador; 
+               
                 return response.json()               
               })
               .catch(error => {
@@ -75,38 +75,33 @@
         //     console.log(imgCarta)
         //   }
         // }, 500);
-     
+        
       };
 
-
-      const crearDeck = () => {
-        /*
-            Creando los elementos del arreglo
-            Las cartas van del número 2 al 10, más  las cartas especiales
-
-          */
-        deck = []; 
-        for (let i = 2; i <= 10; i++) {
-          for (const tipo of tipos) {
-            deck.push(i + tipo);
-          }
-        }
-        for (const tipo of tipos) {
-          for (const especial of cartasEspeciales) {
-            deck.push(especial + tipo);
-          }
-        }
-        /* Desordenando las cartas con la libreria Underscore, con la función _.shuffle*/
-        return _.shuffle(deck);         
-      };
+        const crearDeck = () => {
+            /* Creando los elementos del arreglo Las cartas van del número 2 al 10, más  las cartas especiales */
+            deck = []; 
+            for (let i = 2; i <= 10; i++) {
+              for (const tipo of tipos) {
+                deck.push(i + tipo);
+              }
+            }
+            for (const tipo of tipos) {
+              for (const especial of cartasEspeciales) {
+                deck.push(especial + tipo);
+              }
+            }           
+            /* Desordenando las cartas con la libreria Underscore, con la función _.shuffle*/
+            return _.shuffle(deck);         
+        };
 
       /* Función que me permite tomar  una carta */
 
       const pedirCarta = () => {
-        if (deck.length === 0) {
-            throw "No hay cartas en el Mazo";
-        }       
-        return deck.pop();
+          if (deck.length === 0) {
+              throw "No hay cartas en el Mazo";
+          }       
+          return deck.pop();
       };
 
       /* Función que determina el valor de la Carta */
@@ -132,7 +127,6 @@
 
         setTimeout(() => {
           if (puntosComputadora === puntosMinimos) {
-            // alert("Nadie Gana");
             Swal.fire(
               '! Empate !',
               'Nadie Gana el Juego',
@@ -142,10 +136,18 @@
             // document.querySelector('#aviso').innerText ="Empate - Nadie Gana";
             // document.querySelector('#aviso2').innerText ="*Intentelo Nuevamente*";
           } else if (puntosMinimos > 21) {
-            // alert("*** La Computadora Gana - Suerte para la próxima ***");
-            document.querySelector('.bg-modal').style.display = "flex";
-            document.querySelector('#aviso').innerText ="La Computadora !Gana!";
-            document.querySelector('#aviso2').innerText ="*Suerte para la próxima*";
+            Swal.fire({
+              title: `! La Computadora Gana !`,
+              text: `* Suerte para la próxima *`,
+              imageUrl: 'Assets/images/winner3.gif',
+              imageWidth: 380,
+              imageHeight: 230,
+              imageAlt: 'Ganandor',
+              color: '#D40B0B',              
+            })
+            // document.querySelector('.bg-modal').style.display = "flex";
+            // document.querySelector('#aviso').innerText ="La Computadora !Gana!";
+            // document.querySelector('#aviso2').innerText ="*Suerte para la próxima*";
           } else if (puntosComputadora > 21) {
             // alert("! Felicidades " + jugador + " Ganaste !");
             // document.querySelector('.bg-modal').style.display = "flex";
@@ -161,8 +163,15 @@
               color: '#716add',              
             })
           } else {
-            document.querySelector('.bg-modal').style.display = "flex";
-            document.querySelector('#aviso').innerText ="La Computadora !Gana!";
+            Swal.fire({
+              title: `! La Computadora Gana !`,
+              text: `* Suerte para la próxima *`,
+              imageUrl: 'Assets/images/winner3.gif',
+              imageWidth: 380,
+              imageHeight: 230,
+              imageAlt: 'Ganandor',
+              color: '#D40B0B',              
+            })
           }
         }, 500);
         btnBarajar.disabled = false;
@@ -198,22 +207,22 @@
       });
 
       btnNuevoJuego.addEventListener("click", () => {
-        console.clear();      
-        resetValues();
-        barajarDeck();        
-        deck = crearDeck();
-        btnDetener.disabled = false;
-        btnPedirCarta.disabled = false;
-        btnBarajar.disabled = true;
-        nombreJugadorPantalla.innerText = jugador + " - Puntos: " + puntosJugador;
-        divCartasJugador.innerHTML = `<img class="carta" src="Assets/cartas/red_back.png">`;
-        divCartasComputadora.innerHTML = `<img class="carta" src="Assets/cartas/red_back.png">`;
-        localStorage.removeItem("nombreJugador",jugador);
-        localStorage.removeItem("jugadorpuntos", puntosJugador);
-        localStorage.removeItem("ComputadoraPuntos", puntosComputadora);
-      });
+          console.clear();      
+          resetValues();
+          barajarDeck();        
+          deck = crearDeck();
+          soundFest("play",2);
+          btnDetener.disabled = false;
+          btnPedirCarta.disabled = false;
+          btnBarajar.disabled = true;
+          nombreJugadorPantalla.innerText = jugador + " - Puntos: " + puntosJugador;
+          divCartasJugador.innerHTML = `<img class="carta" src="Assets/cartas/red_back.png">`;
+          divCartasComputadora.innerHTML = `<img class="carta" src="Assets/cartas/red_back.png">`;
+         
+     });
 
-      btnBarajar.addEventListener("click", () => {
+      btnBarajar.addEventListener("click", () => {      
+        soundFest("pausa");
         resetValues();
         deck = crearDeck();
         btnDetener.disabled = false;
@@ -263,6 +272,17 @@
         puntosHtml[0].innerText = 0;
         puntosHtml[1].innerText = 0;
       }
+
+      const soundFest =(valor)=>{
+        const audio = new Audio("//manzdev.github.io/codevember2017/assets/eye-tiger.mp3");   
+        audio.volume = 0.5;  
+          switch (valor) {
+          case "play": audio.play();break;
+          case "pausa": audio.pause(); break;
+          case "stop": audio.stop(); break;
+          
+      }
+    } 
 
       window.addEventListener('beforeunload',(e)=>{
         saveLocalStorage();
