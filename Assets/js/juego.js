@@ -7,7 +7,8 @@
             cartasEspeciales = ["A", "J", "Q", "K"];
       let puntosJugador = 0,
           puntosComputadora = 0;
-      let jugador = "Jugador";
+      let jugador="";
+    
 
       // Referencias del HTML
       const btnPedirCarta = document.querySelector("#btnPedirCarta"),
@@ -23,12 +24,44 @@
       btnPedirCarta.disabled = true;
 
       const barajarDeck = () => {
-        crearDeck();
-        jugador = prompt("Nombre:", "Jugador");
-        if (jugador === null) {
-          jugador = "Jugador";
-        }
-        nombreJugadorPantalla.innerText = jugador + " - Puntos: " + puntosJugador;
+        crearDeck();      
+        Swal.fire({
+          title: 'Introduza nombre del Jugador:',
+          input: 'text',
+          inputAttributes: {
+            autocapitalize: 'off'
+          },
+          showCancelButton: true,
+          confirmButtonText: 'Jugar',
+          showLoaderOnConfirm: true,
+          preConfirm: (login) => {
+           jugador = login;
+           return fetch(`//api.github.com/users/${login}`)
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error(response.statusText)               
+                }
+                jugador = login;
+                nombreJugadorPantalla.innerText = jugador + " - Puntos: " + puntosJugador; 
+                return response.json()               
+              })
+              .catch(error => {
+                Swal.showValidationMessage(
+                  `Request failed: ${error}`
+                )
+              })
+          },
+          allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire({
+              title: `${result.value.login}'s avatar`,
+              imageUrl: result.value.avatar_url
+            })
+          
+          }
+        })
+       
         document.querySelector('#aviso').innerText ="";
         document.querySelector('#aviso2').innerText +="";
 
@@ -42,7 +75,7 @@
         //     console.log(imgCarta)
         //   }
         // }, 500);
-
+     
       };
 
 
@@ -71,9 +104,8 @@
 
       const pedirCarta = () => {
         if (deck.length === 0) {
-                  throw "No hay cartas en el Mazo";
-        }
-       
+            throw "No hay cartas en el Mazo";
+        }       
         return deck.pop();
       };
 
@@ -86,25 +118,29 @@
 
       const turnoComputadora = (puntosMinimos) => {
         do {
-          const carta = pedirCarta();
-          puntosComputadora += valorCarta(carta);
-          puntosHtml[1].innerText = puntosComputadora;
-          const imgCarta = document.createElement("img");
-          imgCarta.src = `Assets/cartas/${carta}.png`;
-          imgCarta.classList.add("carta");
-          divCartasComputadora.append(imgCarta);
-
-          if (puntosMinimos > 21) {
-            break;
-          }
+            const carta = pedirCarta();
+            puntosComputadora += valorCarta(carta);
+            puntosHtml[1].innerText = puntosComputadora;
+            const imgCarta = document.createElement("img");
+            imgCarta.src = `Assets/cartas/${carta}.png`;
+            imgCarta.classList.add("carta");
+            divCartasComputadora.append(imgCarta);
+            if (puntosMinimos > 21) {
+              break;
+            }
         } while (puntosComputadora < puntosMinimos && puntosMinimos <= 21);
 
         setTimeout(() => {
           if (puntosComputadora === puntosMinimos) {
             // alert("Nadie Gana");
-            document.querySelector('.bg-modal').style.display = "flex";
-            document.querySelector('#aviso').innerText ="Empate - Nadie Gana";
-            document.querySelector('#aviso2').innerText ="*Intentelo Nuevamente*";
+            Swal.fire(
+              '! Empate !',
+              'Nadie Gana el Juego',
+              'error'
+            )
+            // document.querySelector('.bg-modal').style.display = "flex";
+            // document.querySelector('#aviso').innerText ="Empate - Nadie Gana";
+            // document.querySelector('#aviso2').innerText ="*Intentelo Nuevamente*";
           } else if (puntosMinimos > 21) {
             // alert("*** La Computadora Gana - Suerte para la próxima ***");
             document.querySelector('.bg-modal').style.display = "flex";
@@ -112,11 +148,19 @@
             document.querySelector('#aviso2').innerText ="*Suerte para la próxima*";
           } else if (puntosComputadora > 21) {
             // alert("! Felicidades " + jugador + " Ganaste !");
-            document.querySelector('.bg-modal').style.display = "flex";
-            document.querySelector('#aviso').innerText =`Felicidades ${jugador}`;
-            document.querySelector('#aviso2').innerText ="! Ganaste !";
+            // document.querySelector('.bg-modal').style.display = "flex";
+            // document.querySelector('#aviso').innerText =`Felicidades ${jugador}`;
+            // document.querySelector('#aviso2').innerText ="! Ganaste !";
+            Swal.fire({
+              title: `! ${jugador} !`,
+              text: `Felicidades Ganaste el juego`,
+              imageUrl: 'Assets/images/winner2.gif',
+              imageWidth: 380,
+              imageHeight: 200,
+              imageAlt: 'Ganandor',
+              color: '#716add',              
+            })
           } else {
-            // alert("Computadora Gana");
             document.querySelector('.bg-modal').style.display = "flex";
             document.querySelector('#aviso').innerText ="La Computadora !Gana!";
           }
@@ -135,62 +179,56 @@
         imgCarta.classList.add("carta");
         divCartasJugador.append(imgCarta);
         nombreJugadorPantalla.innerHTML = jugador + " - Puntos: " + puntosJugador;
-
-        if (puntosJugador > 21) {
-        
-          btnPedirCarta.disabled = true;
-          btnDetener.disabled = true;
-          turnoComputadora(puntosJugador);
-        } else if (puntosJugador === 21) {
-      
-          btnPedirCarta.disabled = true;
-          btnDetener.disabled = true;
-          turnoComputadora(puntosJugador);
-        }
-
+          if (puntosJugador > 21) {        
+            btnPedirCarta.disabled = true;
+            btnDetener.disabled = true;
+            turnoComputadora(puntosJugador);
+          } else if (puntosJugador === 21) {      
+            btnPedirCarta.disabled = true;
+            btnDetener.disabled = true;
+            turnoComputadora(puntosJugador);
+          }
         saveLocalStorage();
       });
 
       btnDetener.addEventListener("click", () => {
-        btnPedirCarta.disabled = true;
-        btnDetener.disabled = true;
-        turnoComputadora(puntosJugador);  
+          btnPedirCarta.disabled = true;
+          btnDetener.disabled = true;
+          turnoComputadora(puntosJugador);  
       });
 
       btnNuevoJuego.addEventListener("click", () => {
-        barajarDeck();
-        console.clear();
-        puntosJugador = 0;
-        puntosComputadora = 0;
-        deck = [];
+        console.clear();      
+        resetValues();
+        barajarDeck();        
         deck = crearDeck();
         btnDetener.disabled = false;
         btnPedirCarta.disabled = false;
         btnBarajar.disabled = true;
-        puntosHtml[0].innerText = 0;
-        puntosHtml[1].innerText = 0;
         nombreJugadorPantalla.innerText = jugador + " - Puntos: " + puntosJugador;
         divCartasJugador.innerHTML = `<img class="carta" src="Assets/cartas/red_back.png">`;
         divCartasComputadora.innerHTML = `<img class="carta" src="Assets/cartas/red_back.png">`;
         localStorage.removeItem("nombreJugador",jugador);
         localStorage.removeItem("jugadorpuntos", puntosJugador);
         localStorage.removeItem("ComputadoraPuntos", puntosComputadora);
-
       });
 
       btnBarajar.addEventListener("click", () => {
-        puntosJugador = 0;
-        puntosComputadora = 0;
-        deck = [];
+        resetValues();
         deck = crearDeck();
         btnDetener.disabled = false;
         btnPedirCarta.disabled = false;
         btnBarajar.disabled = true;
-        puntosHtml[0].innerText = 0;
-        puntosHtml[1].innerText = 0;
         nombreJugadorPantalla.innerText = jugador + " - Puntos: " + puntosJugador;
         divCartasJugador.innerHTML = `<img class="carta" src="Assets/cartas/grey_back.png">`;
         divCartasComputadora.innerHTML = `<img class="carta" src="Assets/cartas/grey_back.png">`;
+        Swal.fire({
+          position: 'center',
+          icon: 'success',
+          title: 'Mazo barajado correctamente',
+          showConfirmButton: false,
+          timer: 900
+        })
       });
 
 
@@ -211,6 +249,19 @@
           puntosHtml[1].innerText = puntosComputadora = localStorage.getItem("computadoraPuntos");
           nombreJugadorPantalla.innerText = jugador + " - Puntos: " + puntosJugador;     
           }  
+      }
+
+      const destroyStorage=()=> {
+        localStorage.removeItem("nombreJugador");
+        localStorage.removeItem("jugadorPuntos");
+        localStorage.removeItem("computadoraPuntos");        
+      }
+
+      const resetValues =()=>{
+        puntosJugador = 0;
+        puntosComputadora = 0;
+        puntosHtml[0].innerText = 0;
+        puntosHtml[1].innerText = 0;
       }
 
       window.addEventListener('beforeunload',(e)=>{
