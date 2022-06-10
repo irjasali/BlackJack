@@ -217,8 +217,7 @@
           btnBarajar.disabled = true;
           nombreJugadorPantalla.innerText = jugador + " - Puntos: " + puntosJugador;
           divCartasJugador.innerHTML = `<img class="carta" src="Assets/cartas/red_back.png">`;
-          divCartasComputadora.innerHTML = `<img class="carta" src="Assets/cartas/red_back.png">`;
-          soundFest("pausa");
+          divCartasComputadora.innerHTML = `<img class="carta" src="Assets/cartas/red_back.png">`;       
          
      });
 
