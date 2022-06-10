@@ -1,5 +1,8 @@
+ import {consultaFetch} from './consultaFetch.js';
 /* Patrón Módulo */ 
+
 (() =>{
+
   'use strict'            
       let deck = [];
       const tipos = ["C", "D", "H", "S"],
@@ -22,49 +25,8 @@
       btnPedirCarta.disabled = true;
 
       const barajarDeck = () => {
-        crearDeck();      
-        Swal.fire({
-          title: 'Introduza nombre del Jugador:',
-          input: 'text',
-          inputAttributes: {
-            autocapitalize: 'off'
-          },
-          showCancelButton: true,
-          confirmButtonText: 'Jugar',
-          showLoaderOnConfirm: true,
-          preConfirm: (login) => {
-           jugador = login;
-           return fetch(`//api.github.com/users/${login}`)
-              .then(response => {
-                if (!response.ok) {
-                  throw new Error(response.statusText)               
-                }
-               
-                jugador = login;
-                nombreJugadorPantalla.innerText = jugador + " - Puntos: " + puntosJugador; 
-               
-                return response.json()               
-              })
-              .catch(error => {
-                Swal.showValidationMessage(
-                  `Request failed: ${error}`
-                )
-              })
-          },
-          allowOutsideClick: () => !Swal.isLoading()
-        }).then((result) => {
-          if (result.isConfirmed) {
-            Swal.fire({
-              title: `${result.value.login}'s avatar`,
-              imageUrl: result.value.avatar_url
-            })
-          
-          }
-        })
-       
-        document.querySelector('#aviso').innerText ="";
-        document.querySelector('#aviso2').innerText +="";
-
+        crearDeck();        
+        consultaFetch(jugador, puntosJugador);
         // Pregunta al Profesor
         // setTimeout(() => {
         //   for (let i = 0; i<= deck.length-1; i++) {
@@ -74,8 +36,7 @@
         //     divCartasComputadora.append(imgCarta);
         //     console.log(imgCarta)
         //   }
-        // }, 500);
-        
+        // }, 500);        
       };
 
         const crearDeck = () => {
@@ -131,10 +92,7 @@
               '! Empate !',
               'Nadie Gana el Juego',
               'error'
-            )
-            // document.querySelector('.bg-modal').style.display = "flex";
-            // document.querySelector('#aviso').innerText ="Empate - Nadie Gana";
-            // document.querySelector('#aviso2').innerText ="*Intentelo Nuevamente*";
+            )            
           } else if (puntosMinimos > 21) {
             Swal.fire({
               title: `! La Computadora Gana !`,
@@ -144,16 +102,9 @@
               imageHeight: 230,
               imageAlt: 'Ganandor',
               color: '#D40B0B',              
-            })
-            // document.querySelector('.bg-modal').style.display = "flex";
-            // document.querySelector('#aviso').innerText ="La Computadora !Gana!";
-            // document.querySelector('#aviso2').innerText ="*Suerte para la próxima*";
+            })           
           } else if (puntosComputadora > 21) {
-            // alert("! Felicidades " + jugador + " Ganaste !");
-            // document.querySelector('.bg-modal').style.display = "flex";
-            // document.querySelector('#aviso').innerText =`Felicidades ${jugador}`;
-            // document.querySelector('#aviso2').innerText ="! Ganaste !";
-            Swal.fire({
+             Swal.fire({
               title: `! ${jugador} !`,
               text: `Felicidades Ganaste el juego`,
               imageUrl: 'Assets/images/winner2.gif',
@@ -222,8 +173,7 @@
          
      });
 
-      btnBarajar.addEventListener("click", () => {      
-        
+      btnBarajar.addEventListener("click", () => {              
         resetValues();
         deck = crearDeck();
         btnDetener.disabled = false;
@@ -242,9 +192,9 @@
       });
 
 
-      document.querySelector('.close').addEventListener("click", function() {
-        document.querySelector('.bg-modal').style.display = "none";
-      });
+      // document.querySelector('.close').addEventListener("click", function() {
+      //   document.querySelector('.bg-modal').style.display = "none";
+      // });
 
       const saveLocalStorage=()=>{
         localStorage.setItem("nombreJugador",jugador);
