@@ -3,13 +3,10 @@ export const muestraCadena=(cadena,jugador,puntosJ)=> {
   document.getElementById(cadena).innerHTML = jugador + " - Puntos: " + puntosJ;
   return jugador;
 }
-export const extraeNombre =(nombre)=>{
-  return nombre;
-}
 
-export const consultaFetch=()=>{
+export const consultaFetch= async()=>{
   let nom="";
-    Swal.fire({
+    await Swal.fire({
         title: 'Introduza nombre del Jugador:',
         input: 'text',
         inputAttributes: {
@@ -18,8 +15,8 @@ export const consultaFetch=()=>{
         showCancelButton: true,
         confirmButtonText: 'Jugar',
         showLoaderOnConfirm: true,
-        preConfirm: (login) => {
-        return fetch(`//api.github.com/users/${login}`)
+        preConfirm: async (login) => {
+        fetch (`//api.github.com/users/${login}`)
             .then(response => {
               nom=login;          
               // nombreJugadorPantalla.innerHTML= nom + " - Puntos: " + 0;
@@ -28,12 +25,12 @@ export const consultaFetch=()=>{
               
               if (!response.ok) {
                 throw new Error(response.statusText)               
-              }
-             
-          
+              }          
               const obj = JSON.parse(login);
               console.log({obj});
-              return response.json();               
+
+              response.json();               
+              return obj; 
             })
             .catch(error => {
               Swal.showValidationMessage(
@@ -47,15 +44,16 @@ export const consultaFetch=()=>{
           Swal.fire({
             title: `${result.value.login}'s avatar`,
             imageUrl: result.value.avatar_url
-          }) 
              
+          }) 
+           
       
           
         }
       
       })     
     
-      return nom;   
+      return nom; 
 }
 
 

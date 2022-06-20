@@ -67,11 +67,11 @@
       });
 
       const barajarDeck = () => {  
-           ;
+          
         deck = crearDeck();
         jugador = consultaFetch();
-        
-        // nombreJugadorPantalla.innerHTML = jugador + " - Puntos: " + puntosJugador;
+        console.log({jugador});
+         nombreJugadorPantalla.innerHTML = jugador + " - Puntos: " + puntosJugador;
        
  
         // setTimeout(() => {
