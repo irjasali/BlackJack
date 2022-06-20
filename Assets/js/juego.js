@@ -1,3 +1,5 @@
+import {empate, ganaComputadora, barajarMazo, muestraCadena, jugadorGana} from './consultaFetch.js';
+
 /* Patrón Módulo */ 
 (() =>{
   'use strict'            
@@ -16,69 +18,50 @@
             divCartasComputadora = document.querySelector("#computadora-cartas"),
             btnNuevoJuego = document.querySelector("#btnNuevoJuego"),
             nombreJugadorPantalla = document.getElementById("nombreJugadorPantalla");
+      /* Creación de la función para crear deck */   
 
-      /* Creación de la función para crear deck */
       btnDetener.disabled = true;
-      btnPedirCarta.disabled = true;
+      btnPedirCarta.disabled = true;     
 
-      const barajarDeck = () => {
-        crearDeck();      
-        Swal.fire({
-          title: 'Introduza nombre del Jugador:',
-          input: 'text',
-          inputAttributes: {
-            autocapitalize: 'off'
-          },
-          showCancelButton: true,
-          confirmButtonText: 'Jugar',
-          showLoaderOnConfirm: true,
-          preConfirm: (login) => {
-           jugador = login;
-           return fetch(`//api.github.com/users/${login}`)
-              .then(response => {
+      const barajarDeck = () => {      
+          Swal.fire({
+            title: 'Introduza nombre del Jugador:',
+            input: 'text',
+            inputAttributes: {
+              autocapitalize: 'off'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Jugar',
+            showLoaderOnConfirm: true,
+            preConfirm: async (login) => {     
+             try {
+                const response = await fetch(`//api.github.com/users/${login}`);
                 if (!response.ok) {
-                  throw new Error(response.statusText)               
+                  throw new Error(response.statusText);
                 }
-               
                 jugador = login;
-                nombreJugadorPantalla.innerText = jugador + " - Puntos: " + puntosJugador; 
-               
-                return response.json()               
-              })
-              .catch(error => {
+                console.log(jugador);
+                muestraCadena("nombreJugadorPantalla", login, puntosJugador);
+                return await response.json();
+              } catch (error) {
                 Swal.showValidationMessage(
                   `Request failed: ${error}`
-                )
+                );
+              }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+          }).then((result) => {
+            if (result.isConfirmed) {
+              Swal.fire({
+                title: `${result.value.login}'s avatar`,
+                imageUrl: result.value.avatar_url
               })
-          },
-          allowOutsideClick: () => !Swal.isLoading()
-        }).then((result) => {
-          if (result.isConfirmed) {
-            Swal.fire({
-              title: `${result.value.login}'s avatar`,
-              imageUrl: result.value.avatar_url
-            })
-          
-          }
-        })
-       
-        document.querySelector('#aviso').innerText ="";
-        document.querySelector('#aviso2').innerText +="";
+             return result.value.login;
+            }
+          })
+        };
 
-        // Pregunta al Profesor
-        // setTimeout(() => {
-        //   for (let i = 0; i<= deck.length-1; i++) {
-        //     const imgCarta = document.createElement("img");
-        //     imgCarta.src = `Assets/cartas/${deck[i]}.png`;
-        //     imgCarta.classList.add("carta_barajeada");
-        //     divCartasComputadora.append(imgCarta);
-        //     console.log(imgCarta)
-        //   }
-        // }, 500);
-        
-      };
-
-        const crearDeck = () => {
+      const crearDeck = () => {
             /* Creando los elementos del arreglo Las cartas van del número 2 al 10, más  las cartas especiales */
             deck = []; 
             for (let i = 2; i <= 10; i++) {
@@ -127,51 +110,13 @@
 
         setTimeout(() => {
           if (puntosComputadora === puntosMinimos) {
-            Swal.fire(
-              '! Empate !',
-              'Nadie Gana el Juego',
-              'error'
-            )
-            // document.querySelector('.bg-modal').style.display = "flex";
-            // document.querySelector('#aviso').innerText ="Empate - Nadie Gana";
-            // document.querySelector('#aviso2').innerText ="*Intentelo Nuevamente*";
+            empate()
           } else if (puntosMinimos > 21) {
-            Swal.fire({
-              title: `! La Computadora Gana !`,
-              text: `* Suerte para la próxima *`,
-              imageUrl: 'Assets/images/winner3.gif',
-              imageWidth: 380,
-              imageHeight: 230,
-              imageAlt: 'Ganandor',
-              color: '#D40B0B',              
-            })
-            // document.querySelector('.bg-modal').style.display = "flex";
-            // document.querySelector('#aviso').innerText ="La Computadora !Gana!";
-            // document.querySelector('#aviso2').innerText ="*Suerte para la próxima*";
+            ganaComputadora();
           } else if (puntosComputadora > 21) {
-            // alert("! Felicidades " + jugador + " Ganaste !");
-            // document.querySelector('.bg-modal').style.display = "flex";
-            // document.querySelector('#aviso').innerText =`Felicidades ${jugador}`;
-            // document.querySelector('#aviso2').innerText ="! Ganaste !";
-            Swal.fire({
-              title: `! ${jugador} !`,
-              text: `Felicidades Ganaste el juego`,
-              imageUrl: 'Assets/images/winner2.gif',
-              imageWidth: 380,
-              imageHeight: 200,
-              imageAlt: 'Ganandor',
-              color: '#716add',              
-            })
+            jugadorGana(jugador);       
           } else {
-            Swal.fire({
-              title: `! La Computadora Gana !`,
-              text: `* Suerte para la próxima *`,
-              imageUrl: 'Assets/images/winner3.gif',
-              imageWidth: 380,
-              imageHeight: 230,
-              imageAlt: 'Ganandor',
-              color: '#D40B0B',              
-            })
+            ganaComputadora();
           }
         }, 500);
         btnBarajar.disabled = false;
@@ -187,7 +132,7 @@
         imgCarta.src = `Assets/cartas/${carta}.png`;
         imgCarta.classList.add("carta");
         divCartasJugador.append(imgCarta);
-        nombreJugadorPantalla.innerHTML = jugador + " - Puntos: " + puntosJugador;
+        muestraCadena("nombreJugadorPantalla",jugador, puntosJugador )        
           if (puntosJugador > 21) {        
             btnPedirCarta.disabled = true;
             btnDetener.disabled = true;
@@ -195,8 +140,7 @@
           } else if (puntosJugador === 21) {      
             btnPedirCarta.disabled = true;
             btnDetener.disabled = true;
-            turnoComputadora(puntosJugador);
-          }
+            turnoComputadora(puntosJugador);          }
         saveLocalStorage();
       });
 
@@ -206,50 +150,40 @@
           turnoComputadora(puntosJugador);  
       });
 
-      btnNuevoJuego.addEventListener("click", () => {       
-          soundFest("play");
+      btnNuevoJuego.addEventListener("click", () => {    
+   
+        soundFest("play");
           console.clear();      
           resetValues();
-          barajarDeck();        
+          barajarDeck();          
           deck = crearDeck();
           btnDetener.disabled = false;
           btnPedirCarta.disabled = false;
           btnBarajar.disabled = true;
-          nombreJugadorPantalla.innerText = jugador + " - Puntos: " + puntosJugador;
+          muestraCadena("nombreJugadorPantalla",jugador, puntosJugador )
           divCartasJugador.innerHTML = `<img class="carta" src="Assets/cartas/red_back.png">`;
           divCartasComputadora.innerHTML = `<img class="carta" src="Assets/cartas/red_back.png">`;       
          
      });
 
       btnBarajar.addEventListener("click", () => {      
-        
         resetValues();
         deck = crearDeck();
         btnDetener.disabled = false;
         btnPedirCarta.disabled = false;
         btnBarajar.disabled = true;
-        nombreJugadorPantalla.innerText = jugador + " - Puntos: " + puntosJugador;
+        muestraCadena("nombreJugadorPantalla",jugador, puntosJugador )
         divCartasJugador.innerHTML = `<img class="carta" src="Assets/cartas/grey_back.png">`;
         divCartasComputadora.innerHTML = `<img class="carta" src="Assets/cartas/grey_back.png">`;
-        Swal.fire({
-          position: 'center',
-          icon: 'success',
-          title: 'Mazo barajado correctamente',
-          showConfirmButton: false,
-          timer: 900
-        })
+        barajarMazo(); 
       });
 
 
-      document.querySelector('.close').addEventListener("click", function() {
-        document.querySelector('.bg-modal').style.display = "none";
-      });
-
-      const saveLocalStorage=()=>{
+        const saveLocalStorage=()=>{
         localStorage.setItem("nombreJugador",jugador);
         localStorage.setItem("jugadorPuntos", puntosJugador);
         localStorage.setItem("computadoraPuntos", puntosComputadora);
-      }
+       }
 
       const getLocalStorage=()=>{
         if ( localStorage.getItem("nombreJugador") ) {
@@ -279,8 +213,7 @@
           switch (valor) {
           case "play": audio.play();break;
           case "pausa": audio.pause(); break;
-          case "stop": audio.stop(); break;
-          
+          case "stop": audio.stop(); break;          
       }
     } 
 
